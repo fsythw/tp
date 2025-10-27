@@ -2,6 +2,8 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.GridPane?>
@@ -28,10 +30,38 @@
                 <Label fx:id="name" text="\$first" styleClass="cell_big_label"/>
             </HBox>
             <FlowPane fx:id="tags"/>
-            <Label fx:id="phone" styleClass="cell_small_label" text="\$phone"/>
-            <Label fx:id="bloodType" styleClass="cell_small_label" text="\$bloodType"/>
-            <Label fx:id="dateOfBirth" styleClass="cell_small_label" text="\$dateOfBirth"/>
-            <Label fx:id="email" styleClass="cell_small_label" text="\$email"/>
+            <HBox spacing="5" alignment="CENTER_LEFT">
+                <ImageView fitHeight="16" fitWidth="16" preserveRatio="true">
+                    <image>
+                        <Image url="@/images/phone_icon.png"/>
+                    </image>
+                </ImageView>
+                <Label fx:id="phone" styleClass="cell_small_label" text="\$phone"/>
+            </HBox>
+            <HBox spacing="5" alignment="CENTER_LEFT">
+                <ImageView fitHeight="16" fitWidth="16" preserveRatio="true">
+                    <image>
+                        <Image url="@/images/blood_drop_icon.png"/>
+                    </image>
+                </ImageView>
+                <Label fx:id="bloodType" styleClass="cell_small_label" text="\$bloodType"/>
+            </HBox>
+            <HBox spacing="5" alignment="CENTER_LEFT">
+                <ImageView fitHeight="16" fitWidth="16" preserveRatio="true">
+                    <image>
+                        <Image url="@/images/birth_date_icon.png"/>
+                    </image>
+                </ImageView>
+                <Label fx:id="dateOfBirth" styleClass="cell_small_label" text="\$dateOfBirth"/>
+            </HBox>
+            <HBox spacing="5" alignment="CENTER_LEFT">
+                <ImageView fitHeight="16" fitWidth="16" preserveRatio="true">
+                    <image>
+                        <Image url="@/images/email_icon.png"/>
+                    </image>
+                </ImageView>
+                <Label fx:id="email" styleClass="cell_small_label" text="\$email"/>
+            </HBox>
         </VBox>
     </GridPane>
 </HBox>

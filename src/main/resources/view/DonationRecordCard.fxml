@@ -2,6 +2,8 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.GridPane?>
@@ -25,12 +27,24 @@
                         <Region fx:constant="USE_PREF_SIZE"/>
                     </minWidth>
                 </Label>
-
-
+            </HBox>
+            <HBox spacing="5" alignment="CENTER_LEFT">
+                <ImageView fitHeight="16" fitWidth="16" preserveRatio="true">
+                    <image>
+                        <Image url="@../images/donation_date_icon.png"/>
+                    </image>
+                </ImageView>
+                <Label fx:id="donationDate" styleClass="cell_small_label" text="\$donationDate"/>
+            </HBox>
+            <HBox spacing="5" alignment="CENTER_LEFT">
+                <ImageView fitHeight="16" fitWidth="16" preserveRatio="true">
+                    <image>
+                        <Image url="@../images/blood_drop_icon.png"/>
+                    </image>
+                </ImageView>
+                <Label fx:id="bloodVolume" styleClass="cell_small_label" text="\$bloodVolume"/>
             </HBox>
             <FlowPane fx:id="tags"/>
-            <Label fx:id="donationDate" styleClass="cell_small_label" text="\$donationDate"/>
-            <Label fx:id="bloodVolume" styleClass="cell_small_label" text="\$bloodVolume"/>
         </VBox>
     </GridPane>
 </HBox>
