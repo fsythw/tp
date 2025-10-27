@@ -37,6 +37,7 @@ public class ModelManager implements Model {
         this.userPrefs = new UserPrefs(userPrefs);
         filteredPersons = new FilteredList<>(this.bloodNet.getPersonList());
         filteredDonationRecords = new FilteredList<>(this.bloodNet.getDonationRecordList());
+        filteredDonationRecords.setPredicate(p -> false);
     }
 
     public ModelManager() {

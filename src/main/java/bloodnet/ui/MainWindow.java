@@ -16,6 +16,8 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 /**
  * The Main Window. Provides the basic application layout containing
@@ -118,8 +120,13 @@ public class MainWindow extends UiPart<Stage> {
         personListPanel = new PersonListPanel(logic.getFilteredPersonList());
         personListPanelPlaceholder.getChildren().add(personListPanel.getRoot());
 
+//        ObservableList donationRecordEmptyList = FXCollections.emptyObservableList();
+//        donationRecordListPanel = new DonationRecordListPanel(donationRecordEmptyList);
+//        donationRecordListPanelPlaceholder.getChildren().add(donationRecordListPanel.getRoot());
+
         donationRecordListPanel = new DonationRecordListPanel(logic.getFilteredDonationRecordList());
         donationRecordListPanelPlaceholder.getChildren().add(donationRecordListPanel.getRoot());
+
 
         resultDisplay = new ResultDisplay();
         resultDisplayPlaceholder.getChildren().add(resultDisplay.getRoot());
