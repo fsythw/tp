@@ -27,11 +27,11 @@ public class FindCommand extends Command {
     }
 
     @Override
-    public CommandResult execute(Model model) {
+    public InputResponse execute(Model model) {
         requireNonNull(model);
         model.updateFilteredPersonList(predicate);
         int filteredPersonListSize = model.getFilteredPersonList().size();
-        return new CommandResult(
+        return new InputResponse(
                 String.format(Messages.MESSAGE_PEOPLE_LISTED_OVERVIEW,
                         filteredPersonListSize,
                         filteredPersonListSize > 1 ? "s" : ""));

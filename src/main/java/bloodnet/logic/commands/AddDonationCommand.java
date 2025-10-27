@@ -5,6 +5,7 @@ import static bloodnet.logic.parser.CliSyntax.PREFIX_DONATION_DATE;
 import static bloodnet.logic.parser.CliSyntax.PREFIX_PERSON_INDEX_ONE_BASED;
 import static java.util.Objects.requireNonNull;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -39,6 +40,8 @@ public class AddDonationCommand extends Command {
     public static final String MESSAGE_SUCCESS = "New donation record added: %1$s";
     public static final String MESSAGE_DUPLICATE_DONATION_RECORD =
                                                 "This donation record already exists in BloodNet";
+    public static final String MESSAGE_CONCATENATED_VALIDATION_ERRORS_HEADER =
+            "This record violates the following eligibility criteria: ";
 
     private final Index targetPersonIndex;
     private final DonationDate donationDate;
@@ -56,7 +59,7 @@ public class AddDonationCommand extends Command {
     }
 
     @Override
-    public CommandResult execute(Model model) throws CommandException {
+    public InputResponse execute(Model model) throws CommandException {
         requireNonNull(model);
 
         Person personToAddRecordFor = getPersonToAddRecordFor(model);
@@ -66,13 +69,22 @@ public class AddDonationCommand extends Command {
 
         DonationRecord donationRecord = new DonationRecord(null, personId, donationDate, bloodVolume);
 
+        ArrayList<String> validationErrorStrings = donationRecord.validate(model);
+        if (!validationErrorStrings.isEmpty()) {
+            String concatenatedMessage = MESSAGE_CONCATENATED_VALIDATION_ERRORS_HEADER;
+            for (String validationErrorString : validationErrorStrings) {
+                concatenatedMessage += "\n- " + validationErrorString;
+            }
+            throw new CommandException(concatenatedMessage);
+        }
+
         if (model.hasDonationRecord(donationRecord)) {
             throw new CommandException(MESSAGE_DUPLICATE_DONATION_RECORD);
         }
 
         model.addDonationRecord(donationRecord);
 
-        return new CommandResult(String.format(MESSAGE_SUCCESS, Messages.format(donationRecord, personToAddRecordFor)));
+        return new InputResponse(String.format(MESSAGE_SUCCESS, Messages.format(donationRecord, personToAddRecordFor)));
     }
 
     @Override

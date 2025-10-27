@@ -4,6 +4,7 @@ import static bloodnet.logic.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
 import static bloodnet.logic.Messages.MESSAGE_UNKNOWN_COMMAND;
 import static bloodnet.testutil.Assert.assertThrows;
 import static bloodnet.testutil.TypicalIndexes.INDEX_FIRST_PERSON;
+import static bloodnet.testutil.TypicalPersons.getTypicalBloodNet;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -22,9 +23,13 @@ import bloodnet.logic.commands.EditDonationCommand;
 import bloodnet.logic.commands.ExitCommand;
 import bloodnet.logic.commands.FindCommand;
 import bloodnet.logic.commands.FindDonationsCommand;
+import bloodnet.logic.commands.FindEligibleCommand;
 import bloodnet.logic.commands.HelpCommand;
 import bloodnet.logic.commands.ListCommand;
 import bloodnet.logic.parser.exceptions.ParseException;
+import bloodnet.model.Model;
+import bloodnet.model.ModelManager;
+import bloodnet.model.UserPrefs;
 import bloodnet.model.donationrecord.BloodVolume;
 import bloodnet.model.person.NameContainsKeywordsPredicate;
 import bloodnet.model.person.Person;
@@ -72,6 +77,27 @@ public class BloodNetParserTest {
     }
 
     @Test
+    public void parseCommand_editdonations() throws Exception {
+        EditDonationCommand command = (EditDonationCommand) parser.parseCommand(
+                EditDonationCommand.COMMAND_WORD + " "
+                        + INDEX_FIRST_PERSON.getOneBased() + " v/200");
+        EditDonationCommand.EditDonationRecordDescriptor edit = new EditDonationCommand.EditDonationRecordDescriptor();
+        edit.setBloodVolume(new BloodVolume("200"));
+        assertEquals(new EditDonationCommand(INDEX_FIRST_PERSON, edit), command);
+    }
+
+    @Test
+    public void parseCommand_findeligible() throws Exception {
+        Model model = new ModelManager(getTypicalBloodNet(), new UserPrefs());
+        List<String> bloodType = Arrays.asList("A+", "O+", "AB+");
+        FindEligibleCommand command = (FindEligibleCommand) parser.parseCommand(
+                FindEligibleCommand.COMMAND_WORD + " A+ O+ AB+");
+        assertEquals(new FindEligibleCommand(bloodType),
+                command);
+    }
+
+
+    @Test
     public void parseCommand_find() throws Exception {
         List<String> keywords = Arrays.asList("foo", "bar", "baz");
         FindCommand command = (FindCommand) parser.parseCommand(
@@ -83,21 +109,9 @@ public class BloodNetParserTest {
     public void parseCommand_finddonations() throws Exception {
         FindDonationsCommand command = (FindDonationsCommand) parser.parseCommand(
                 FindDonationsCommand.COMMAND_WORD + " "
-                        + INDEX_FIRST_PERSON.getOneBased());
+                + INDEX_FIRST_PERSON.getOneBased());
         assertEquals(new FindDonationsCommand(INDEX_FIRST_PERSON), command);
     }
-
-    @Test
-    public void parseCommand_editdonations() throws Exception {
-        EditDonationCommand command = (EditDonationCommand) parser.parseCommand(
-                EditDonationCommand.COMMAND_WORD + " "
-                        + INDEX_FIRST_PERSON.getOneBased() + " v/200");
-        EditDonationCommand.EditDonationRecordDescriptor edit = new EditDonationCommand.EditDonationRecordDescriptor();
-        edit.setBloodVolume(new BloodVolume("200"));
-        assertEquals(new EditDonationCommand(INDEX_FIRST_PERSON, edit), command);
-    }
-
-
 
     @Test
     public void parseCommand_help() throws Exception {
@@ -114,7 +128,7 @@ public class BloodNetParserTest {
     @Test
     public void parseCommand_unrecognisedInput_throwsParseException() {
         assertThrows(ParseException.class, String.format(MESSAGE_INVALID_COMMAND_FORMAT, HelpCommand.MESSAGE_USAGE), ()
-                -> parser.parseCommand(""));
+            -> parser.parseCommand(""));
     }
 
     @Test

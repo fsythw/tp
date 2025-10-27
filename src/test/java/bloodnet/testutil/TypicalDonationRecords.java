@@ -23,7 +23,7 @@ public class TypicalDonationRecords {
                     new DonationDate("15-01-2025"), new BloodVolume("400")),
             new DonationRecord(UUID.fromString("01ab240a-2e7a-4beb-a8a1-5f9325019b28"),
                     UUID.fromString("a7460411-cc1f-4b17-a75c-3009a766679a"),
-                    new DonationDate("15-10-2025"), new BloodVolume("450"))
+                    new DonationDate("15-05-2025"), new BloodVolume("450"))
     );
     public static final DonationRecord ALICE_DONATION_RECORD = ALICE_DONATION_RECORDS.get(0);
 

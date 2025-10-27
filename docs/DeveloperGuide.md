@@ -1,20 +1,16 @@
 ---
-  layout: default.md
-    title: "Developer Guide"
-    pageNav: 3
+layout: default.md
+title: "Developer Guide"
+pageNav: 3
 ---
-
 # BloodNet Developer Guide
-
-<!-- * Table of Contents -->
-<page-nav-print />
 
 --------------------------------------------------------------------------------------------------------------------
 
 ## **Acknowledgements**
 
-..{ list here sources of all reused/adapted ideas, code, documentation, and third-party libraries -- include links to the original source as well }_
-
+- Blood donation eligibility criteria in Singapore were based on guidelines from the Health Sciences Authority
+<!-- Can add more, if used -->
 --------------------------------------------------------------------------------------------------------------------
 
 ## **Setting up, getting started**
@@ -29,7 +25,7 @@ Refer to the guide [_Setting up and getting started_](SettingUp.md).
 
 <puml src="diagrams/ArchitectureDiagram.puml" width="280" />
 
-The ***Architecture Diagram*** given above explains the high-level design of the App.
+The ***Architecture Diagram*** shown above explains the high-level design of the App.
 
 Given below is a quick overview of main components and how they interact with each other.
 
@@ -54,7 +50,7 @@ The *Sequence Diagram* below shows how the components interact with each other f
 
 <puml src="diagrams/ArchitectureSequenceDiagram.puml" width="574" />
 
-Each of the four main components (also shown in the diagram above),
+Each of the four main components (also shown in the above diagram),
 
 * defines its *API* in an `interface` with the same name as the Component.
 * implements its functionality using a concrete `{Component Name}Manager` class (which follows the corresponding API `interface` mentioned in the previous point.
@@ -102,10 +98,10 @@ The sequence diagram below illustrates the interactions within the `Logic` compo
 How the `Logic` component works:
 
 1. When `Logic` is called upon to execute a command, it is passed to an `BloodNetParser` object which in turn creates a parser that matches the command (e.g., `DeleteCommandParser`) and uses it to parse the command.
-1. This results in a `Command` object (more precisely, an object of one of its subclasses e.g., `DeleteCommand`) which is executed by the `LogicManager`.
-1. The command can communicate with the `Model` when it is executed (e.g. to delete a person).<br>
+2. This results in a `Command` object (more precisely, an object of one of its subclasses e.g., `DeleteCommand`) which is executed by the `LogicManager`.
+3. The command can communicate with the `Model` when it is executed (e.g. to delete a person).<br>
    Note that although this is shown as a single step in the diagram above (for simplicity), in the code it can take several interactions (between the command object and the `Model`) to achieve.
-1. The result of the command execution is encapsulated as a `CommandResult` object which is returned back from `Logic`.
+4. The result of the command execution is encapsulated as a `CommandResult` object which is returned back from `Logic`.
 
 Here are the other classes in `Logic` (omitted from the class diagram above) that are used for parsing a user command:
 
@@ -123,11 +119,10 @@ How the parsing works:
 
 The `Model` component,
 
-* stores the bloodnet data i.e., all `Person` objects (which are contained in a `UniquePersonList` object).
+* stores the BloodNet data i.e., all `Person` objects (which are contained in a `UniquePersonList` object).
 * stores the currently 'selected' `Person` objects (e.g., results of a search query) as a separate _filtered_ list which is exposed to outsiders as an unmodifiable `ObservableList<Person>` that can be 'observed' e.g. the UI can be bound to this list so that the UI automatically updates when the data in the list change.
 * stores a `UserPref` object that represents the user’s preferences. This is exposed to the outside as a `ReadOnlyUserPref` objects.
 * does not depend on any of the other three components (as the `Model` represents data entities of the domain, they should make sense on their own without depending on other components)
-
 
 
 ### Storage component
@@ -165,25 +160,25 @@ These operations are exposed in the `Model` interface as `Model#commitBloodNet()
 
 Given below is an example usage scenario and how the undo/redo mechanism behaves at each step.
 
-Step 1. The user launches the application for the first time. The `VersionedBloodNet` will be initialized with the initial bloodnet state, and the `currentStatePointer` pointing to that single bloodnet state.
+Step 1. The user launches the application for the first time. The `VersionedBloodNet` will be initialized with the initial BloodNet state, and the `currentStatePointer` pointing to that single BloodNet state.
 
 <puml src="diagrams/UndoRedoState0.puml" alt="UndoRedoState0" />
 
-Step 2. The user executes `delete 5` command to delete the 5th person in the bloodnet. The `delete` command calls `Model#commitBloodNet()`, causing the modified state of the bloodnet after the `delete 5` command executes to be saved in the `BloodNetStateList`, and the `currentStatePointer` is shifted to the newly inserted bloodnet state.
+Step 2. The user executes `delete 5` command to delete the 5th person in BloodNet. The `delete` command calls `Model#commitBloodNet()`, causing the modified state of BloodNet after the `delete 5` command executes to be saved in the `BloodNetStateList`, and the `currentStatePointer` is shifted to the newly inserted BloodNet state.
 
 <puml src="diagrams/UndoRedoState1.puml" alt="UndoRedoState1" />
 
-Step 3. The user executes `add n/David …​` to add a new person. The `add` command also calls `Model#commitBloodNet()`, causing another modified bloodnet state to be saved into the `BloodNetStateList`.
+Step 3. The user executes `add n/David …​` to add a new person. The `add` command also calls `Model#commitBloodNet()`, causing another modified BloodNet state to be saved into the `BloodNetStateList`.
 
 <puml src="diagrams/UndoRedoState2.puml" alt="UndoRedoState2" />
 
 <box type="info" seamless>
 
-**Note:** If a command fails its execution, it will not call `Model#commitBloodNet()`, so the bloodnet state will not be saved into the `BloodNetStateList`.
+**Note:** If a command fails its execution, it will not call `Model#commitBloodNet()`, so the BloodNet state will not be saved into the `BloodNetStateList`.
 
 </box>
 
-Step 4. The user now decides that adding the person was a mistake, and decides to undo that action by executing the `undo` command. The `undo` command will call `Model#undoBloodNet()`, which will shift the `currentStatePointer` once to the left, pointing it to the previous bloodnet state, and restores the bloodnet to that state.
+Step 4. The user now decides that adding the person was a mistake, and decides to undo that action by executing the `undo` command. The `undo` command will call `Model#undoBloodNet()`, which will shift the `currentStatePointer` once to the left, pointing it to the previous BloodNet state, and restores the BloodNet to that state.
 
 <puml src="diagrams/UndoRedoState3.puml" alt="UndoRedoState3" />
 
@@ -217,11 +212,11 @@ The `redo` command does the opposite — it calls `Model#redoBloodNet()`, wh
 
 </box>
 
-Step 5. The user then decides to execute the command `list`. Commands that do not modify the bloodnet, such as `list`, will usually not call `Model#commitBloodNet()`, `Model#undoBloodNet()` or `Model#redoBloodNet()`. Thus, the `BloodNetStateList` remains unchanged.
+Step 5. The user then decides to execute the command `list`. Commands that do not modify BloodNet, such as `list`, will usually not call `Model#commitBloodNet()`, `Model#undoBloodNet()` or `Model#redoBloodNet()`. Thus, the `BloodNetStateList` remains unchanged.
 
 <puml src="diagrams/UndoRedoState4.puml" alt="UndoRedoState4" />
 
-Step 6. The user executes `clear`, which calls `Model#commitBloodNet()`. Since the `currentStatePointer` is not pointing at the end of the `BloodNetStateList`, all bloodnet states after the `currentStatePointer` will be purged. Reason: It no longer makes sense to redo the `add n/David …​` command. This is the behavior that most modern desktop applications follow.
+Step 6. The user executes `clear`, which calls `Model#commitBloodNet()`. Since the `currentStatePointer` is not pointing at the end of the `BloodNetStateList`, all BloodNet states after the `currentStatePointer` will be purged. Reason: It no longer makes sense to redo the `add n/David …​` command. This is the behavior that most modern desktop applications follow.
 
 <puml src="diagrams/UndoRedoState5.puml" alt="UndoRedoState5" />
 
@@ -233,7 +228,7 @@ The following activity diagram summarizes what happens when a user executes a ne
 
 **Aspect: How undo & redo executes:**
 
-* **Alternative 1 (current choice):** Saves the entire bloodnet.
+* **Alternative 1 (current choice):** Saves the entire BloodNet.
     * Pros: Easy to implement.
     * Cons: May have performance issues in terms of memory usage.
 
@@ -243,11 +238,6 @@ The following activity diagram summarizes what happens when a user executes a ne
     * Cons: We must ensure that the implementation of each individual command are correct.
 
 _{more aspects and alternatives to be added}_
-
-### \[Proposed\] Data archiving
-
-_{Explain here how the data archiving feature will be implemented}_
-
 
 --------------------------------------------------------------------------------------------------------------------
 
@@ -275,48 +265,33 @@ _{Explain here how the data archiving feature will be implemented}_
 * is reasonably comfortable using CLI apps
 * wants to filter profiles such as by blood type
 
-**Value proposition**: manage blood-donor profiles more efficiently as opposed to a typical mouse driven app
-
+**Value proposition**: manage blood donor profiles more efficiently as opposed to a typical mouse driven app
 
 ### User stories
 
 Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unlikely to have) - `*`
 
-| Priority | As a …      | I want to …                                                                                               | So that …                                                                                                  |
-| -------- | ----------- |-----------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------|
-| * * *    | admin staff | add a donor’s contact & blood type                                                                        | the blood bank can keep in touch with the donor if more information is needed                                    |
-| * * *    | admin staff | add a donor’s gender                                                                                      | the blood bank is aware of the haemoglobin level of the person                                                   |
-| * * *    | admin staff | add a donor’s DOB                                                                                         | the blood bank knows if the person is eligible for donating blood                                                |
-| * * *    | admin staff | add a donor’s medical history                                                                             | the blood bank can keep track if the person has any conditions                                                   |
-| * * *    | admin staff | search donors by name                                                                                     | I can find their contact information if I need to contact them                                                   |
-| * * *    | admin staff | modify a donor’s contact information                                                                      | I can fix the stored contact information if it was keyed in wrongly previously                                   |
-| * * *    | admin staff | modify a donor’s DOB                                                                                      | I can fix the stored date of birth if it was keyed in wrongly                                                    |
-| * * *    | admin staff | modify a donor’s blood type                                                                               | I can fix the stored blood type if it was keyed in wrongly previously                                            |
-| * * *    | admin staff | modify a person’s medical history                                                                         | I can fix the stored medical history if it had been typed in wrongly previously                                  |
-| * * *    | admin staff | delete a donor (soft-delete / archive)                                                                    | Remove donors who have passed away or are no longer eligible for donation                                        |
-| * * *    | admin staff | list all donors in the system                                                                             | Have a quick overview of all the people who have agreed to donate blood to us                                    |
-| * * *    | admin staff | find all donors of a particular blood type                                                                | If we have a shortage of a particular blood type, we can contact these people and ask them for donations         |
-| * * *    | admin staff | record a blood donation by a contact                                                                      | I can track how many donations each contact has made, and the details of those donations                 |
-| * * *    | admin staff | modify a blood donation record                                                                            | I can modify wrongly keyed in records                                                                                  |
-| * * *    | admin staff | delete a blood donation record                                                                            | I can remove wrongly keyed in records                                                                                  |
-| * * *    | admin staff | sort all blood donation records of a contact                                                              | I can see a person’s blood donation history to determine if it has been at least 12 weeks since their last donation |
-| * * *    | admin staff | check if a person is eligible for donation on a particular date (based on age and last donation interval) | I can quickly determine if the person is eligible for donation on their requested appointment date               |
-| * * *    | manager     | report the breakdown of contacts by blood group                                                           | I can understand which blood group we are lacking donors in                                                      |
-| * * *    | admin staff | record a blood donor’s emergency contact(s)                                                               | I can reach out to someone if there are complications after a blood donation (e.g. donor faints)                 |
-| * *      | admin staff | modify a donor’s gender                                                                                   | I can fix a person’s gender if typed wrongly                                                                     | |
-| * *      | admin staff | find a donor based on contact information                                                                 | I can link their name and contact information together                                                           |
-| * *      | admin staff | export donor contact information into a file                                                              | I can share donor lists with approved stakeholders when needed                                                   |
-| * *      | admin staff | be able to choose which fields to anonymise when exporting information                                    | I can comply with data protection policies                                                                       |
-| * *      | admin staff | send reminders to eligible donors for their next donation                                                 | Donors are aware of when they can donate again                                                                   |
-| * *      | admin staff | tag a donor as unavailable                                                                                | they are not contacted when they cannot donate (traveling, ill etc)                                           |
-| * *      | admin staff | add a donor’s weight                                                                                      | I know how much blood can be drawn from a donor in accord with minimum weight requirements                       |
-| * *      | admin staff | modify a donor’s weight                                                                                   | I can update the donor’s weight or fix it if I typed wrongly                                                     |
-| * *      | admin staff | mass import donor information from a file                                                                 | I can quickly onboard data from other instances of the same system within the blood bank                         |
-| * *      | admin staff | detect duplicate donors                                                                                   | I can quickly identify duplicate data in the system and reconcile it to reduce data pollution                    |
-| * *      | manager     | see donor demographics (e.g. age ranges, gender distribution)                                             | I can understand our donor base better to plan outreach programmes accordingly                                   |
-| *        | admin staff | check the date when the weight is last updated                                                            | I know if I should request a weight update based on the recency of the data                                      |
-| *        | manager     | view a record of every change done to the system                                                          | I can establish accountability for a system holding sensitive data                                               |
-| *        | admin staff | record how much blood was donated by a donor in a session                                                 | I can recommend donors who have been very active for appreciation awards, to incentivise more donors             |
+| Priority | As a …      | I want to …                                                                           | So that …                                                                                                                            |
+| -------- | ----------- |---------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|
+| * * *    | admin staff | add a donor’s contact & blood type                                                    | the blood bank can keep in touch with the donor if more information is needed                                                        |
+| * * *    | admin staff | add a donor’s date of birth                                                           | the blood bank knows can determine a person's eligibility in donating blood                                                          |
+| * * *    | admin staff | search donors by name                                                                 | I can find their contact information if I need to contact them                                                                       |
+| * * *    | admin staff | modify a donor’s contact information                                                  | I can fix the stored contact information if it was keyed in wrongly previously                                                       |
+| * * *    | admin staff | modify a donor’s date of birth                                                        | I can fix the stored date of birth if it was keyed in wrongly                                                                        |
+| * * *    | admin staff | modify a donor’s blood type                                                           | I can fix the stored blood type if it was keyed in wrongly previously                                                                |
+| * * *    | admin staff | delete a donor (soft-delete / archive)                                                | Remove donors who have passed away or are no longer eligible for donation                                                            |
+| * * *    | admin staff | list all donors in the system                                                         | Have a quick overview of all the people who have agreed to donate blood to us                                                        |
+| * * *    | admin staff | find all donors of a particular blood type                                            | If we have a shortage of a particular blood type, we can contact these people and ask them for donations                             |
+| * * *    | admin staff | record a blood donation by a contact                                                  | I can track how many donations each contact has made, and the details of those donations                                             |
+| * * *    | admin staff | modify a blood donation record                                                        | I can modify wrongly keyed in records                                                                                                |
+| * * *    | admin staff | add the volume and donation date associated with a donation record                    | the blood bank is aware of the details associated with each donation record                                                          
+| * * *    | admin staff | delete a blood donation record                                                        | I can remove wrongly keyed in records                                                                                                |
+| * * *    | admin staff | find all eligible donors given a blood type (based on age and last donation interval) | I can determine who I can call if blood is needed                                                                                    |
+| * *      | admin staff | find a donor based on contact information                                             | I can link their name and contact information together                                                                               |
+| * *      | admin staff | detect duplicate donors                                                               | I can quickly identify duplicate data in the system and reconcile it to reduce data pollution                                        |
+| * *      | admin staff | detect duplicate donation records associated with the same person                     | I am able to quickly identify duplicate data in the BloodNet system and reconcile it to reduce data pollution                        |
+| *        | admin staff | record how much blood was donated by a donor in a session                             | I can recommend donors who have been very active for appreciation awards, to incentivise more donors                                 |
+| *        | admin staff | record when a donor donated blood in a session                                        | I can maintain accurate records of each donor’s donation history |
 
 
 ### Use cases
@@ -420,16 +395,23 @@ Use case ends.
 
 ---
 
-### **Use case: UC06 - Find all donors of a particular blood type**
+### **Use case: UC06 - Find all eligible donors of a particular blood type**
 
 **Actor**: Admin staff
 
 **MSS**
 
 1. Admin staff requests to find donors of a particular blood type.
-2. BloodNet searches for and displays all donors matching the specified blood type.
+2. BloodNet searches the entire donor list and applies the eligibility rules, such as date of birth and days since last donation.
+3. BloodNet displays all donors who match the given blood type and the eligibility rules. 
 
 Use case ends.
+
+**Extensions**
+
+* 1a. Invalid blood type entered. 
+  * 1a1. BloodNet shows an error message. 
+  * Use case relates back to step 1, prompting the user to re-enter a blood type.
 
 ---
 
@@ -483,9 +465,7 @@ Use case ends.
     * 3a1. BloodNet shows an error message.
     * Use case returns to step 3.
 
-
 ---
-
 
 ### **Use case: UC09 - Modify a blood donation record**
 
@@ -551,74 +531,12 @@ Use case ends.
 
 ---
 
-### **Use case: UC11 - Check if a person is eligible for donation on a particular date**
-
-**Actor**: Admin staff
-
-**MSS**
-
-1. Admin staff requests to find a donor by their name.
-2. BloodNet searches and displays donors with matching names.
-3. Admin staff requests to check if a specified donor is eligible for donation on a particular date.
-4. BloodNet checks if the donor meets age and 12-week interval rules, and shows eligible or not eligible status with reason.
-
-Use case ends.
-
-**Extensions**
-
-* 2a. No donors match the search name.
-    * Use case ends.
-
-* 3a. Donor ID is invalid.
-    * 3a1. BloodNet shows an error message.
-    * Use case returns to step 3
-
----
-
-### **Use case: UC12 - See donor demographics (e.g. age ranges, gender distribution)**
-
-**Actor**: Manager
-
-**MSS**
-
-1. Manager requests to see donor demographics.
-2. BloodNet computes and shows breakdown of donor population by age, gender, etc.
-
-Use case ends.
-
----
-
-### **Use case: UC13 - Report the breakdown of contacts by blood group**
-
-**Actor**: Manager
-
-**MSS**
-
-1. Manager requests to see the breakdown of contacts by blood group.
-2. BloodNet displays a breakdown of donors by blood group.
-
-Use case ends.
-
----
-
-### **Use case: UC14 - View a record of every change done to the system**
-
-**Actor**: Manager
-
-**MSS**
-
-1. Manager requests to see the audit log.
-2. BloodNet displays all actions made (add/update/delete), with timestamps and user roles.
-
-Use case ends.
-
-
 
 ### Non-Functional Requirements
 
 1.  Should work on any _mainstream OS_ as long as it has Java `17` or above installed.
 2.  Should be able to hold up to 1000 persons and the program should still be responsive with response time less than 1 second for each operation.
-3.  A user with above average typing speed for regular English text (i.e. not code, not system admin commands) should be able to accomplish most of the tasks faster using commands than using the mouse.
+3.  A user with above average typing speed for regular English text (i.e. not code, not system admin commands) should be able to accomplish most of the tasks faster using commands rather than using the mouse.
 4. Should start within 5 seconds on a typical user machine (4 core CPU, 8GB RAM, SSD).
 5. User guide should be written with easy-to-understand English that is comprehensible to users without technical background.
 6. The user interface should be intuitive enough for users who are not IT-saavy.
@@ -626,15 +544,15 @@ Use case ends.
 8. Should have user confirmation for _destructive operations_.
 9. Should provide error message, in response to an invalid operation, that details what went wrong and how to fix it for a non-technical user.
 10. Should be designed for a single user within a single computer.
-11. Should backup contacts data within a human-editable file such that it persists across instances of the program.
+11. Should back up contacts data within a human-editable file such that it persists across instances of the program.
 12. Should work without requiring an installer.
 13. Should be built into a JAR file of no larger than 100MB.
 
 
 ### Glossary
 
-* **Blood Type**: The blood types suppported are A+, A-, B+, B-, AB+, AB-, O+ and O-
-* **Donor**: People who donate blood to others
+* **Blood Type**: The blood types supported are A+, A-, B+, B-, AB+, AB-, O+ and O-
+* **Donor**: Person who donates blood to others
 * **Destructive operation**: An action that leads to permanent removal of data
 * **Mainstream OS**: Windows, Linux, Unix, MacOS
 * **Private contact detail**: A Singaporean (+65) contact detail that is not meant to be shared with others
@@ -658,16 +576,14 @@ testers are expected to do more *exploratory* testing.
 
     1. Download the jar file and copy into an empty folder
 
-    1. Double-click the jar file Expected: Shows the GUI with a set of sample contacts. The window size may not be optimum.
+    2. Double-click the jar file Expected: Shows the GUI with a set of sample contacts. The window size may not be optimum.
 
-1. Saving window preferences
+2. Saving window preferences
 
     1. Resize the window to an optimum size. Move the window to a different location. Close the window.
 
-    1. Re-launch the app by double-clicking the jar file.<br>
+    2. Re-launch the app by double-clicking the jar file.<br>
        Expected: The most recent window size and location is retained.
-
-1. _{ more test cases …​ }_
 
 ### Deleting a person
 

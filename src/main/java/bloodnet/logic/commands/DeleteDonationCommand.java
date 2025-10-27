@@ -49,11 +49,11 @@ public class DeleteDonationCommand extends Command {
     }
 
     @Override
-    public CommandResult execute(Model model) throws CommandException {
+    public InputResponse execute(Model model) throws CommandException {
         DonationRecord donationToDelete = getDonationToDelete(model);
         Person relatedPerson = getPersonForDonation(model, donationToDelete, targetIndex);
         model.deleteDonationRecord(donationToDelete);
-        return new CommandResult(String.format(MESSAGE_DELETE_DONATION_SUCCESS, Messages.format(donationToDelete,
+        return new InputResponse(String.format(MESSAGE_DELETE_DONATION_SUCCESS, Messages.format(donationToDelete,
                 relatedPerson)));
     }
 

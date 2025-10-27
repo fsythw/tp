@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import bloodnet.commons.core.GuiSettings;
 import bloodnet.commons.core.index.Index;
 import bloodnet.logic.commands.exceptions.CommandException;
+import bloodnet.model.BloodNet;
 import bloodnet.model.Model;
 import bloodnet.model.ReadOnlyBloodNet;
 import bloodnet.model.ReadOnlyUserPrefs;
@@ -17,6 +18,7 @@ import bloodnet.model.donationrecord.BloodVolume;
 import bloodnet.model.donationrecord.DonationDate;
 import bloodnet.model.donationrecord.DonationRecord;
 import bloodnet.model.person.Person;
+import bloodnet.testutil.TypicalDonationRecords;
 import bloodnet.testutil.TypicalPersons;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -64,15 +66,30 @@ public class AddDonationCommandTest {
     public void execute_validArguments_success() throws Exception {
         ModelStub modelStub = new ModelStubWithPerson();
         Index indexStub = Index.fromZeroBased(0);
-        DonationDate donationDateStub = new DonationDate("01-01-2025");
+        // more than 84 days after Alice's donation record (valid)
+        DonationDate donationDateStub = new DonationDate("25-10-2025");
         BloodVolume bloodVolumeStub = new BloodVolume("450");
 
         AddDonationCommand addDonationCommand =
                 new AddDonationCommand(indexStub, donationDateStub, bloodVolumeStub);
 
-        CommandResult commandResult = addDonationCommand.execute(modelStub);
+        InputResponse inputResponse = addDonationCommand.execute(modelStub);
 
-        assert(commandResult.getFeedbackToUser().contains("New donation record added"));
+        assert(inputResponse.getFeedbackToUser().contains("New donation record added"));
+    }
+
+    @Test
+    public void execute_invalidDonationDate_throwsCommandException() throws Exception {
+        ModelStub modelStub = new ModelStubWithPerson();
+        Index indexStub = Index.fromZeroBased(0);
+        // less than 84 days after Alice's donation record
+        DonationDate donationDateStub = new DonationDate("16-01-2025");
+        BloodVolume bloodVolumeStub = new BloodVolume("450");
+
+        AddDonationCommand addDonationCommand =
+                new AddDonationCommand(indexStub, donationDateStub, bloodVolumeStub);
+
+        assertThrows(CommandException.class, () -> addDonationCommand.execute(modelStub));
     }
 
     @Test
@@ -259,14 +276,21 @@ public class AddDonationCommandTest {
      */
     private class ModelStubWithPerson extends ModelStub {
         private final Person person;
+        private final DonationRecord donationRecord;
 
         ModelStubWithPerson() {
             this.person = TypicalPersons.ALICE;
+            this.donationRecord = TypicalDonationRecords.ALICE_DONATION_RECORD;
         }
 
         @Override
         public ObservableList<Person> getFilteredPersonList() {
             return FXCollections.observableArrayList(person);
+        }
+
+        @Override
+        public ObservableList<DonationRecord> getFilteredDonationRecordList() {
+            return FXCollections.observableArrayList(donationRecord);
         }
 
         @Override
@@ -277,6 +301,14 @@ public class AddDonationCommandTest {
         @Override
         public void addDonationRecord(DonationRecord donationRecord) {
             // Do nothing
+        }
+
+        @Override
+        public BloodNet getBloodNet() {
+            BloodNet bloodNet = new BloodNet();
+            bloodNet.addPerson(person);
+            bloodNet.addDonationRecord(donationRecord);
+            return bloodNet;
         }
     }
 }

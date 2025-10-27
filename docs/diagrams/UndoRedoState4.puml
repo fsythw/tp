@@ -7,9 +7,9 @@ skinparam ClassBackgroundColor #FFFFAA
 title After command "list"
 
 package States <<rectangle>> {
-    class State1 as "<u>ab0:BloodNet</u>"
-    class State2 as "<u>ab1:BloodNet</u>"
-    class State3 as "<u>ab2:BloodNet</u>"
+    class State1 as "<u>bn0:BloodNet</u>"
+    class State2 as "<u>bn1:BloodNet</u>"
+    class State3 as "<u>bn2:BloodNet</u>"
 }
 
 State1 -[hidden]right-> State2

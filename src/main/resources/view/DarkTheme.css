@@ -149,14 +149,14 @@
     -fx-background-color: derive(#1d1d1d, 30%);
 }
 
-.result-display {
+.output-display {
     -fx-background-color: transparent;
     -fx-font-family: "Segoe UI Light";
     -fx-font-size: 13pt;
     -fx-text-fill: white;
 }
 
-.result-display .label {
+.output-display .label {
     -fx-text-fill: black !important;
 }
 
@@ -320,7 +320,7 @@
     -fx-text-fill: #F70D1A;
 }
 
-#commandTextField {
+#inputField {
     -fx-background-color: transparent #383838 transparent #383838;
     -fx-background-insets: 0;
     -fx-border-color: #383838 #383838 #ffffff #383838;
@@ -335,7 +335,7 @@
     -fx-effect: innershadow(gaussian, black, 10, 0, 0, 0);
 }
 
-#resultDisplay .content {
+#outputDisplay .content {
     -fx-background-color: transparent, #383838, transparent, #383838;
     -fx-background-radius: 0;
 }
