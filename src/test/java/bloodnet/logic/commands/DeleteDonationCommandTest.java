@@ -147,7 +147,7 @@ public class DeleteDonationCommandTest {
     @Test
     public void createSession_validModel_returnsConfirmationCommandSession() throws CommandException {
         Model model = new ModelManager(getTypicalBloodNet(), new UserPrefs());
-        CommandSession session = (new DeleteCommand(Index.fromZeroBased(0))).createSession(model);
+        CommandSession session = (new DeleteDonationCommand(Index.fromZeroBased(0))).createSession(model);
 
         assertTrue(session instanceof ConfirmationCommandSession);
         assertFalse(session.isDone());

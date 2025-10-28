@@ -76,6 +76,12 @@ public class DeleteCommand extends Command {
             throw new CommandException(Messages.MESSAGE_INVALID_PERSON_DISPLAYED_INDEX);
         }
 
-        return lastShownList.get(targetIndex.getZeroBased());
+        Person personToDelete = lastShownList.get(targetIndex.getZeroBased());
+
+        if (model.hasDonationRecordFor(personToDelete)) {
+            throw new CommandException(Messages.MESSAGE_DELETE_PERSON_WITH_DONATION);
+        }
+
+        return personToDelete;
     }
 }

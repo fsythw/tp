@@ -12,8 +12,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 import bloodnet.commons.util.ToStringBuilder;
-import bloodnet.model.Model;
+import bloodnet.model.person.DateOfBirth;
 import bloodnet.model.person.Person;
+import javafx.collections.ObservableList;
 
 /**
  * Represents a Donation Record in BloodNet.
@@ -22,16 +23,19 @@ import bloodnet.model.person.Person;
 public class DonationRecord {
     // Static validation error strings
     public static final String MESSAGE_AGE_BELOW_16 =
-            "Donor is too young on the donation date. Donation date must be on %s (their 16th birthdate) or later.";
-    public static final String MESSAGE_PREDECESSOR_DONATION_TOO_CLOSE =
-            "Days since predecessor donation date cannot be less than 84. Donation date must be on %s or later.";
-    public static final String MESSAGE_SUCCESSOR_DONATION_TOO_CLOSE =
-            "Days from successor donation date cannot be less than 84. Donation date must be on %s or earlier.";
+            "Donor is too young on the donation date. "
+            + "Donation date cannot be between %s (their birthdate) "
+            + "and %s (one day before their 16th birthdate) inclusive.";
+    public static final String MESSAGE_NEIGHBOURING_DONATION_TOO_CLOSE =
+            "Consecutive donations must be at least 12 weeks (84 days) apart. "
+            + "However, the donor has already donated blood on %s. "
+            + "Therefore, the donation date cannot be between %s and %s inclusive.";
     public static final String MESSAGE_FIRST_TIME_DONOR_TOO_OLD =
-            "This is a first-time donor. Donation date must be strictly before %s (their 61st birthdate).";
+            "This is a first-time donor. "
+            + "Donation date cannot be on or after %s (their 61st birthdate).";
     public static final String MESSAGE_NON_RECENT_DONOR_TOO_OLD =
             "This is a repeated donor. However, they have not donated blood in the last 3 years. "
-            + "Donation date must be strictly before %s (their 66th birthdate).";
+            + "Donation date cannot be on or after %s (their 66th birthdate).";
 
     // Identity fields
     private UUID id;
@@ -40,6 +44,10 @@ public class DonationRecord {
 
     // Data fields
     private final BloodVolume bloodVolume;
+
+    // Fields which aren't actually stored in the database, but displayed
+    // in the UI
+    private String donorName;
 
     /**
      * Every field other than ID must be present and not null.
@@ -71,6 +79,14 @@ public class DonationRecord {
 
     public BloodVolume getBloodVolume() {
         return bloodVolume;
+    }
+
+    public void setDonorName(String donorName) {
+        this.donorName = donorName;
+    }
+
+    public String getDonorName() {
+        return donorName;
     }
 
     /**
@@ -119,7 +135,8 @@ public class DonationRecord {
      *
      * @return an {@code ArrayList} containing a list of validation error strings
      */
-    public ArrayList<String> validate(Model model) {
+    public ArrayList<String> validate(ObservableList<Person> fullPersonList,
+                                      ObservableList<DonationRecord> fullDonationRecordList) {
         ArrayList<String> validationErrorStrings = new ArrayList<>();
 
         // We try to resolve the personId to a person by
@@ -130,7 +147,7 @@ public class DonationRecord {
         // by the isEligibleToDonate predicate,
         // which may create a DonationRecord object
         // with a personId that is not in the filteredPersonList.
-        Person person = model.getBloodNet().getPersonList().stream()
+        Person person = fullPersonList.stream()
                 .filter(p -> p.getId().equals(personId))
                 .findFirst()
                 .orElseThrow();
@@ -143,20 +160,36 @@ public class DonationRecord {
         if (ageAtDonation < 16) {
             LocalDate sixteenthBirthday = dateOfBirthValue.plusYears(16);
             String errorString = String.format(MESSAGE_AGE_BELOW_16,
-                                                sixteenthBirthday.format(DonationDate.DATE_FORMATTER));
+                                                dateOfBirthValue.format(DateOfBirth.DATE_FORMATTER),
+                                                sixteenthBirthday.minusDays(1).format(DonationDate.DATE_FORMATTER));
             validationErrorStrings.add(errorString);
         }
 
+        // If .validate() is called when trying to edit a donation record,
+        // we want to filter fullDonationRecordList to only include those records that are
+        // not the record that is currently being edited.
+
+        // However, if .validate() is called by IsEligibleToDonatePredicate#test(Person)
+        // or by AddDonationCommand#execute(),
+        // we do not want to impose the above-mentioned filter.
+
+        // If this.getId() == null, this method
+        // is being called by either IsEligibleToDonatePredicate#test(Person)
+        // or AddDonationCommand#execute().
+        boolean isDonationRecordIdNull = this.getId() == null;
+
         // Find predecessor (last donation before donationDate)
-        Optional<DonationDate> predecessorDonationDateOptional = model.getFilteredDonationRecordList().stream()
+        Optional<DonationDate> predecessorDonationDateOptional = fullDonationRecordList.stream()
                 .filter(donationRecord -> donationRecord.getPersonId().equals(person.getId()))
+                .filter(donationRecord -> isDonationRecordIdNull || !donationRecord.getId().equals(this.getId()))
                 .map(DonationRecord::getDonationDate)
                 .filter(dd -> dd.getValue().isBefore(donationDateValue))
                 .max(Comparator.comparing(DonationDate::getValue));
 
         // Find successor (first donation after donationDate)
-        Optional<DonationDate> successorDonationDateOptional = model.getFilteredDonationRecordList().stream()
+        Optional<DonationDate> successorDonationDateOptional = fullDonationRecordList.stream()
                 .filter(donationRecord -> donationRecord.getPersonId().equals(person.getId()))
+                .filter(donationRecord -> isDonationRecordIdNull || !donationRecord.getId().equals(this.getId()))
                 .map(DonationRecord::getDonationDate)
                 .filter(dd -> dd.getValue().isAfter(donationDateValue))
                 .min(Comparator.comparing(DonationDate::getValue));
@@ -167,8 +200,10 @@ public class DonationRecord {
             long daysSinceLastDonation = ChronoUnit.DAYS.between(predecessorDonationDate,
                     donationDateValue);
             if (daysSinceLastDonation < 84) {
-                String errorString = String.format(MESSAGE_PREDECESSOR_DONATION_TOO_CLOSE,
-                                                    predecessorDonationDate.plusDays(84)
+                String errorString = String.format(MESSAGE_NEIGHBOURING_DONATION_TOO_CLOSE,
+                                                    predecessorDonationDate.format(DonationDate.DATE_FORMATTER),
+                                                    predecessorDonationDate.format(DonationDate.DATE_FORMATTER),
+                                                    predecessorDonationDate.plusDays(83)
                                                                            .format(DonationDate.DATE_FORMATTER));
                 validationErrorStrings.add(errorString);
             }
@@ -180,9 +215,11 @@ public class DonationRecord {
             long daysToNextDonation = ChronoUnit.DAYS.between(donationDateValue,
                     successorDonationDate);
             if (daysToNextDonation < 84) {
-                String errorString = String.format(MESSAGE_SUCCESSOR_DONATION_TOO_CLOSE,
-                                                    successorDonationDate.minusDays(84)
-                                                                         .format(DonationDate.DATE_FORMATTER));
+                String errorString = String.format(MESSAGE_NEIGHBOURING_DONATION_TOO_CLOSE,
+                                                    successorDonationDate.format(DonationDate.DATE_FORMATTER),
+                                                    successorDonationDate.minusDays(83)
+                                                                         .format(DonationDate.DATE_FORMATTER),
+                                                    successorDonationDate.format(DonationDate.DATE_FORMATTER));
                 validationErrorStrings.add(errorString);
             }
         }

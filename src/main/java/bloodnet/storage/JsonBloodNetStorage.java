@@ -4,6 +4,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -16,9 +17,7 @@ import bloodnet.commons.util.JsonUtil;
 import bloodnet.model.BloodNet;
 import bloodnet.model.ReadOnlyBloodNet;
 import bloodnet.model.donationrecord.DonationRecord;
-import bloodnet.model.donationrecord.UniqueDonationRecordList;
 import bloodnet.model.person.Person;
-import bloodnet.model.person.UniquePersonList;
 
 /**
  * A class to access BloodNet data stored as a json file on the hard disk.
@@ -58,7 +57,22 @@ public class JsonBloodNetStorage implements BloodNetStorage {
         }
 
         try {
-            return Optional.of(jsonBloodNet.get().toModelType());
+            BloodNet bloodNet = jsonBloodNet.get().toModelType();
+
+            // Populate the "donorName" field of the DonationRecords
+            for (DonationRecord donationRecord : bloodNet.getDonationRecordList()) {
+                List<Person> matchingPersons = bloodNet.getPersonList().stream()
+                        .filter(person -> person.getId().equals(donationRecord.getPersonId())).toList();
+
+                assert matchingPersons.size() == 1;
+
+                String donorName = matchingPersons.get(0).getName().toString();
+                donationRecord.setDonorName(donorName);
+            }
+
+            logger.info("Successfully populated each donation record's donor name");
+
+            return Optional.of(bloodNet);
         } catch (IllegalValueException ive) {
             logger.info("Illegal values found in " + filePath + ": " + ive.getMessage());
             throw new DataLoadingException(ive);
@@ -92,24 +106,18 @@ public class JsonBloodNetStorage implements BloodNetStorage {
         // causing test cases to fail is to remove the "id" field from the equals() function,
         // but that also kind of doesn't make sense.
 
-        BloodNet updatedBloodNet = new BloodNet();
-
         // Iterate through each person and generate a UUID for it if it doesn't have an ID yet.
-        UniquePersonList updatedPersonList = new UniquePersonList();
         for (Person person : bloodNet.getPersonList()) {
             if (person.getId() == null) {
                 person.setId(UUID.randomUUID());
             }
-            updatedPersonList.add(person);
         }
 
         // Iterate through each donationRecord and generate a UUID for it if it doesn't have an ID yet.
-        UniqueDonationRecordList updatedDonationRecordList = new UniqueDonationRecordList();
         for (DonationRecord donationRecord : bloodNet.getDonationRecordList()) {
             if (donationRecord.getId() == null) {
                 donationRecord.setId(UUID.randomUUID());
             }
-            updatedDonationRecordList.add(donationRecord);
         }
 
         FileUtil.createIfMissing(filePath);

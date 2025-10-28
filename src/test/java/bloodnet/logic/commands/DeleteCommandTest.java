@@ -22,6 +22,7 @@ import bloodnet.model.Model;
 import bloodnet.model.ModelManager;
 import bloodnet.model.UserPrefs;
 import bloodnet.model.person.Person;
+import bloodnet.testutil.TypicalDonationRecords;
 
 /**
  * Contains integration tests (interaction with the Model) and unit tests for
@@ -128,6 +129,13 @@ public class DeleteCommandTest {
     }
 
     @Test
+    public void createSession_personHasRecords_throwsCommandException() {
+        Model model = new ModelManager(TypicalDonationRecords.getTypicalBloodNet(), new UserPrefs());
+        DeleteCommand deleteCommand = new DeleteCommand(Index.fromZeroBased(0));
+        assertThrows(CommandException.class, () -> deleteCommand.createSession(model));
+    }
+
+    @Test
     public void createSession_validModel_returnsConfirmationCommandSession() throws CommandException {
         Model model = new ModelManager(getTypicalBloodNet(), new UserPrefs());
         CommandSession session = (new DeleteCommand(Index.fromZeroBased(0))).createSession(model);
@@ -135,5 +143,4 @@ public class DeleteCommandTest {
         assertTrue(session instanceof ConfirmationCommandSession);
         assertFalse(session.isDone());
     }
-
 }

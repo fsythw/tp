@@ -72,7 +72,9 @@ public class EditDonationCommand extends Command {
         assert personId != null;
         DonationRecord editedDonationRecord = createEditedDonationRecord(recordToEdit, editDonationRecordDescriptor);
 
-        ArrayList<String> validationErrorStrings = editedDonationRecord.validate(model);
+        ArrayList<String> validationErrorStrings = editedDonationRecord
+                                                        .validate(model.getBloodNet().getPersonList(),
+                                                                  model.getBloodNet().getDonationRecordList());
         if (!validationErrorStrings.isEmpty()) {
             String concatenatedMessage = MESSAGE_CONCATENATED_VALIDATION_ERRORS_HEADER;
             for (String validationErrorString : validationErrorStrings) {

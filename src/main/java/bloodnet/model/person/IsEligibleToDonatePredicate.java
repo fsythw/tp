@@ -41,7 +41,8 @@ public class IsEligibleToDonatePredicate implements Predicate<Person> {
                                                             person.getId(),
                                                             donationDate,
                                                             new BloodVolume("1"));
-        ArrayList<String> validationErrorStrings = donationRecord.validate(model);
+        ArrayList<String> validationErrorStrings = donationRecord.validate(model.getBloodNet().getPersonList(),
+                                                                           model.getBloodNet().getDonationRecordList());
         return validationErrorStrings.isEmpty();
     }
 

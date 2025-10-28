@@ -22,6 +22,9 @@ public class DonationRecordCard extends UiPart<Region> {
     private Label id;
 
     @FXML
+    private Label donorName;
+
+    @FXML
     private Label donationDate;
 
     @FXML
@@ -34,6 +37,7 @@ public class DonationRecordCard extends UiPart<Region> {
         super(FXML);
         this.record = record;
         id.setText(displayedIndex + ". ");
+        donorName.setText(record.getDonorName());
         donationDate.setText(record.getDonationDate().toString());
         bloodVolume.setText(record.getBloodVolume().toString() + " ml");
 

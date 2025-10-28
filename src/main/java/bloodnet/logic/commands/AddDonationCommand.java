@@ -69,7 +69,8 @@ public class AddDonationCommand extends Command {
 
         DonationRecord donationRecord = new DonationRecord(null, personId, donationDate, bloodVolume);
 
-        ArrayList<String> validationErrorStrings = donationRecord.validate(model);
+        ArrayList<String> validationErrorStrings = donationRecord.validate(model.getBloodNet().getPersonList(),
+                                                                           model.getBloodNet().getDonationRecordList());
         if (!validationErrorStrings.isEmpty()) {
             String concatenatedMessage = MESSAGE_CONCATENATED_VALIDATION_ERRORS_HEADER;
             for (String validationErrorString : validationErrorStrings) {

@@ -33,12 +33,11 @@ public class PhoneTest {
         assertFalse(Phone.isValidPhone("9312 1534")); // spaces within digits
         assertFalse(Phone.isValidPhone("911")); //too short numbers
         assertFalse(Phone.isValidPhone("1232142141242142")); //too long numbers
-
+        assertFalse(Phone.isValidPhone("12429444")); // Does not start with either 3, 6, 8, or 9
 
         // valid phone numbers
-        assertTrue(Phone.isValidPhone("91145678")); // exactly 3 numbers
+        assertTrue(Phone.isValidPhone("91145678"));
         assertTrue(Phone.isValidPhone("93121534"));
-        assertTrue(Phone.isValidPhone("12429444")); // long phone numbers
     }
 
     @Test

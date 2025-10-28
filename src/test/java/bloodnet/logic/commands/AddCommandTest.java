@@ -170,6 +170,11 @@ public class AddCommandTest {
         }
 
         @Override
+        public boolean hasDonationRecordFor(Person person) {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
         public void deleteDonationRecord(DonationRecord target) {
             throw new AssertionError("This method should not be called.");
         }

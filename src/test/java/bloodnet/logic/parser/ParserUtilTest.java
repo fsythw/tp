@@ -17,14 +17,14 @@ import bloodnet.model.person.Name;
 import bloodnet.model.person.Phone;
 
 public class ParserUtilTest {
-    private static final String INVALID_NAME = "R@chel";
+    private static final String INVALID_NAME = "R23";
     private static final String INVALID_PHONE = "+651234";
     private static final String INVALID_BLOOD_TYPE = " ";
     private static final String INVALID_DATE_OF_BIRTH = "XX-20-1000";
     private static final String INVALID_EMAIL = "example.com";
 
     private static final String VALID_NAME = "Rachel Walker";
-    private static final String VALID_PHONE = "12345678";
+    private static final String VALID_PHONE = "88888888";
     private static final String VALID_BLOOD_TYPE = "B+";
     private static final String VALID_EMAIL = "rachel@example.com";
     private static final String VALID_DATE_OF_BIRTH = "10-12-1998";

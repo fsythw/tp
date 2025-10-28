@@ -10,7 +10,7 @@ import static java.util.Objects.requireNonNull;
 public class BloodVolume {
 
     public static final String MESSAGE_CONSTRAINTS =
-            "Blood volume should be a whole number, in millilitres";
+            "Blood volume should be a positive whole number, in millilitres";
 
     public final Integer volume;
 

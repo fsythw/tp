@@ -30,7 +30,7 @@ for locations where internet service is unreliable!
    A GUI similar to the below should appear in a few seconds. Note how the app contains some sample data.<br>
    ![Ui](images/Ui.png)
 
-5. Type the command in the command box and press Enter to execute it. e.g. typing **`help`** and pressing Enter will
+5. Type the command in the command box and press <kbd>Enter</kbd> to execute it. e.g. typing **`help`** and pressing <kbd>Enter</kbd> will
    open the help window.<br>
    Some example commands you can try:
 
@@ -47,6 +47,8 @@ for locations where internet service is unreliable!
        donate based on their date of birth and number of days since last donation.
 
     * `exit` : Exits the app.
+
+6. Press <kbd>F1</kbd> or type **`help`** in the command box and press <kbd>Enter</kbd> to open the [help window](#viewing-help--help), which provides a summary of all command usages. 
 
 6. Refer to the [Features](#features) below for details of each command.
 

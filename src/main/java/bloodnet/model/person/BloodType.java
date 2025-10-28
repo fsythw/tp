@@ -28,7 +28,7 @@ public class BloodType {
     public BloodType(String bloodType) {
         requireNonNull(bloodType);
         checkArgument(isValidBloodType(bloodType), MESSAGE_CONSTRAINTS);
-        this.value = bloodType;
+        this.value = bloodType.toUpperCase();
     }
 
     /**

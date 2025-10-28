@@ -19,6 +19,9 @@ public class Messages {
     public static final String MESSAGE_INVALID_PERSON_DISPLAYED_INDEX = "The person index provided is invalid";
     public static final String MESSAGE_INVALID_DONATION_DISPLAYED_INDEX =
             "The donation record index provided is invalid";
+    public static final String MESSAGE_DELETE_PERSON_WITH_DONATION =
+        "This person has existing donation records and cannot be deleted.\n"
+        + "Please delete their donation records first before removing the person.";
     // Should find a more elegant way to handle plurality.
     // For the second placeholder, pass in '' if singular, 's' if plural
     public static final String MESSAGE_PEOPLE_LISTED_OVERVIEW = "%d person%s listed!";

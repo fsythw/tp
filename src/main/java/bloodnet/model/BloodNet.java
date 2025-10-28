@@ -111,6 +111,17 @@ public class BloodNet implements ReadOnlyBloodNet {
         persons.remove(key);
     }
 
+    /**
+     * Checks if {@code person} has any {@code DonationRecord}
+     * in bloodnet.
+     */
+    public boolean hasDonationRecordFor(Person person) {
+        requireNonNull(person);
+        return donationRecords.asUnmodifiableObservableList()
+                .stream()
+                .anyMatch(record -> record.getPersonId().equals(person.getId()));
+    }
+
     //// donationRecord-level operations
 
     /**
@@ -125,8 +136,8 @@ public class BloodNet implements ReadOnlyBloodNet {
      * Adds a donationRecord to the bloodnet.
      * The donationRecord must not already exist in the bloodnet.
      */
-    public void addDonationRecord(DonationRecord p) {
-        donationRecords.add(p);
+    public void addDonationRecord(DonationRecord donationRecord) {
+        donationRecords.add(donationRecord);
     }
 
     /**

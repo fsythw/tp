@@ -27,6 +27,7 @@
                         <Region fx:constant="USE_PREF_SIZE"/>
                     </minWidth>
                 </Label>
+                <Label fx:id="donorName" text="\$first" styleClass="cell_big_label"/>
             </HBox>
             <HBox spacing="5" alignment="CENTER_LEFT">
                 <ImageView fitHeight="16" fitWidth="16" preserveRatio="true">

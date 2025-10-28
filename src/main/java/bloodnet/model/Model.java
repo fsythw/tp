@@ -100,6 +100,12 @@ public interface Model {
     boolean hasDonationRecord(DonationRecord donationRecord);
 
     /**
+     * Returns true if {@code person} has an existing donation record
+     * in the bloodnet.
+     */
+    boolean hasDonationRecordFor(Person person);
+
+    /**
      * Deletes the given donationRecord.
      * The donationRecord must exist in the bloodnet.
      */
